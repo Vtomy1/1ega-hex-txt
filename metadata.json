@@ -1,0 +1,6 @@
+{
+  "name": "EGA HexStudio - 4-Bit Image to Hex Converter",
+  "description": "Convert images to 4-bit 0-F hex data using classic EGA and retro 16-color palettes with dithering algorithms, custom width and height, and TXT export.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
