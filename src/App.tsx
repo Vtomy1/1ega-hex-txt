@@ -198,6 +198,17 @@ export default function App() {
     setIsCustomPalette(true);
   };
 
+  // Handle Reordering Colors in Custom Palette (organizing slots 0 to F)
+  const handleReorderCustomColors = (newColors: PaletteColor[]) => {
+    const reindexed = newColors.map((color, idx) => ({
+      ...color,
+      index: idx,
+      hexNibble: HEX_DIGITS[idx],
+    }));
+    setCustomColors(reindexed);
+    setIsCustomPalette(true);
+  };
+
   const handleResetCustomPalette = () => {
     setCustomColors(
       EGA_STANDARD_COLORS.map(([hexColor, name], index) => ({
@@ -291,6 +302,7 @@ export default function App() {
               }
               onSelectPalette={handleSelectPalette}
               onUpdateCustomColor={handleUpdateCustomColor}
+              onReorderCustomColors={handleReorderCustomColors}
               colorCounts={processedData?.colorCounts}
               totalPixels={width * height}
               isCustomPalette={isCustomPalette}

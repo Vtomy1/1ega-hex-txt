@@ -138,3 +138,93 @@ export class PaletteMatcher {
     };
   }
 }
+
+export type PaletteSortCriteria = 'index' | 'brightness' | 'hue' | 'hex';
+export type SortDirection = 'asc' | 'desc';
+
+// Get perceived brightness (0 - 255)
+export function getPerceivedBrightness(r: number, g: number, b: number): number {
+  return 0.299 * r + 0.587 * g + 0.114 * b;
+}
+
+// Convert RGB to HSL (Hue in [0, 360), Saturation in [0, 1], Lightness in [0, 1])
+export function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const rNorm = r / 255;
+  const gNorm = g / 255;
+  const bNorm = b / 255;
+
+  const max = Math.max(rNorm, gNorm, bNorm);
+  const min = Math.min(rNorm, gNorm, bNorm);
+  const delta = max - min;
+  const l = (max + min) / 2;
+
+  let h = 0;
+  let s = 0;
+
+  if (delta !== 0) {
+    s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+
+    if (max === rNorm) {
+      h = ((gNorm - bNorm) / delta + (gNorm < bNorm ? 6 : 0)) * 60;
+    } else if (max === gNorm) {
+      h = ((bNorm - rNorm) / delta + 2) * 60;
+    } else {
+      h = ((rNorm - gNorm) / delta + 4) * 60;
+    }
+  }
+
+  return { h, s, l };
+}
+
+// Sort PaletteColor array by criteria
+export function sortPaletteColors(
+  colors: PaletteColor[],
+  criteria: PaletteSortCriteria,
+  direction: SortDirection = 'asc'
+): PaletteColor[] {
+  const sorted = [...colors];
+
+  sorted.sort((a, b) => {
+    let comparison = 0;
+
+    if (criteria === 'brightness') {
+      const bA = getPerceivedBrightness(a.rgb[0], a.rgb[1], a.rgb[2]);
+      const bB = getPerceivedBrightness(b.rgb[0], b.rgb[1], b.rgb[2]);
+      comparison = bA - bB;
+      if (Math.abs(comparison) < 0.001) {
+        comparison = a.index - b.index;
+      }
+    } else if (criteria === 'hue') {
+      const hslA = rgbToHsl(a.rgb[0], a.rgb[1], a.rgb[2]);
+      const hslB = rgbToHsl(b.rgb[0], b.rgb[1], b.rgb[2]);
+
+      // Grayscale/achromatic items (very low saturation, e.g. < 0.08) are grouped together first by lightness
+      const isGrayA = hslA.s < 0.08;
+      const isGrayB = hslB.s < 0.08;
+
+      if (isGrayA && !isGrayB) {
+        comparison = -1;
+      } else if (!isGrayA && isGrayB) {
+        comparison = 1;
+      } else if (isGrayA && isGrayB) {
+        comparison = hslA.l - hslB.l;
+      } else {
+        comparison = hslA.h - hslB.h;
+        if (Math.abs(comparison) < 0.5) {
+          comparison = hslA.l - hslB.l;
+        }
+      }
+    } else if (criteria === 'hex') {
+      const hexValA = parseInt(a.hexColor.replace('#', ''), 16);
+      const hexValB = parseInt(b.hexColor.replace('#', ''), 16);
+      comparison = hexValA - hexValB;
+    } else {
+      // 'index' default
+      comparison = a.index - b.index;
+    }
+
+    return direction === 'asc' ? comparison : -comparison;
+  });
+
+  return sorted;
+}
