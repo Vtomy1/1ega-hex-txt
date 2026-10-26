@@ -13,6 +13,7 @@ import { ViewportCanvas } from './components/ViewportCanvas';
 import { HexExportDrawer } from './components/HexExportDrawer';
 import { PalettesGuide } from './components/PalettesGuide';
 import { FormatGuide } from './components/FormatGuide';
+import { ColorHistogram } from './components/ColorHistogram';
 import {
   ColorMetric,
   DitherAlgorithm,
@@ -362,6 +363,23 @@ export default function App() {
                 />
               </div>
             </div>
+
+            {/* 16-Color Distribution Histogram */}
+            <ColorHistogram
+              processedData={processedData}
+              palette={
+                isCustomPalette
+                  ? {
+                      id: 'custom',
+                      name: 'Custom User Palette',
+                      category: 'Custom',
+                      description: '',
+                      colors: customColors,
+                    }
+                  : currentPalette
+              }
+              totalPixels={width * height}
+            />
 
             {/* Bottom Export Drawer */}
             <HexExportDrawer
