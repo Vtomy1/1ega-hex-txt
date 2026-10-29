@@ -164,6 +164,24 @@ export const PaletteViewer: React.FC<PaletteViewerProps> = ({
 
           <button
             onClick={() => {
+              const cgaPal = ALL_PALETTES.find((p) => p.id === 'cga-mode4-cyan');
+              if (cgaPal) {
+                onSelectPalette(cgaPal);
+                setSortBy('index');
+              }
+            }}
+            className={`px-2.5 py-1 rounded text-xs transition-colors cursor-pointer border whitespace-nowrap ${
+              currentPalette.id === 'cga-mode4-cyan' && !isCustomPalette
+                ? 'bg-cyan-500 text-black font-semibold border-cyan-400 shadow-sm'
+                : 'text-neutral-300 hover:text-white bg-[#1a2035] border-neutral-700/80 hover:bg-[#252e4c]'
+            }`}
+            title="Switch to Iconic DOS CGA Mode 4 (Cyan / Magenta / White / Black)"
+          >
+            CGA Cyan/Mag
+          </button>
+
+          <button
+            onClick={() => {
               const egaPal = ALL_PALETTES.find((p) => p.id === 'ega-standard');
               if (egaPal) {
                 onSelectPalette(egaPal);

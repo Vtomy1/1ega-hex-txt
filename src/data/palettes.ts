@@ -82,6 +82,86 @@ export const EGA_ALT_COLORS: [string, string][] = [
   ['#FFFFFF', 'Bright White'],
 ];
 
+// IBM CGA 16-Color RGBI Standard (1981)
+export const CGA_RGBI_COLORS: [string, string][] = [
+  ['#000000', 'Black (IRGB 0000)'],
+  ['#0000AA', 'Blue (IRGB 0001)'],
+  ['#00AA00', 'Green (IRGB 0010)'],
+  ['#00AAAA', 'Cyan (IRGB 0011)'],
+  ['#AA0000', 'Red (IRGB 0100)'],
+  ['#AA00AA', 'Magenta (IRGB 0101)'],
+  ['#AA5500', 'Brown (IRGB 0110 with color fix)'],
+  ['#AAAAAA', 'Light Gray (IRGB 0111)'],
+  ['#555555', 'Dark Gray (IRGB 1000)'],
+  ['#5555FF', 'Light Blue (IRGB 1001)'],
+  ['#55FF55', 'Light Green (IRGB 1010)'],
+  ['#55FFFF', 'Light Cyan (IRGB 1011)'],
+  ['#FF5555', 'Light Red (IRGB 1100)'],
+  ['#FF55FF', 'Light Magenta (IRGB 1101)'],
+  ['#FFFF55', 'Yellow (IRGB 1110)'],
+  ['#FFFFFF', 'Bright White (IRGB 1111)'],
+];
+
+// IBM CGA Mode 4 Gaming (Cyan / Magenta / White 16-Slot Dither Ramp)
+export const CGA_MODE4_CYAN_MAGENTA_COLORS: [string, string][] = [
+  ['#000000', 'CGA Black'],
+  ['#002B2B', 'Deep Teal Shadow'],
+  ['#005555', 'Dark Cyan (Low-Mid)'],
+  ['#00AAAA', 'Cyan (Low Intensity)'],
+  ['#2A8080', 'Medium Aqua'],
+  ['#55FFFF', 'Bright Cyan (High Intensity)'],
+  ['#2B002B', 'Deep Plum Shadow'],
+  ['#550055', 'Dark Magenta (Low-Mid)'],
+  ['#AA00AA', 'Magenta (Low Intensity)'],
+  ['#D42AD4', 'Medium Orchid'],
+  ['#FF55FF', 'Bright Magenta (High Intensity)'],
+  ['#555555', 'Charcoal Gray'],
+  ['#AAAAAA', 'Light Gray (Low Intensity)'],
+  ['#FFAAFF', 'Pale Lavender Highlight'],
+  ['#AAFFFF', 'Pale Ice Cyan'],
+  ['#FFFFFF', 'Bright White (High Intensity)'],
+];
+
+// IBM CGA Mode 4 Gaming (Green / Red / Yellow 16-Slot Dither Ramp)
+export const CGA_MODE4_GREEN_RED_COLORS: [string, string][] = [
+  ['#000000', 'CGA Black'],
+  ['#002B00', 'Deep Pine Shadow'],
+  ['#005500', 'Dark Green (Low-Mid)'],
+  ['#00AA00', 'Green (Low Intensity)'],
+  ['#2AD42A', 'Emerald Tint'],
+  ['#55FF55', 'Bright Green (High Intensity)'],
+  ['#2B0000', 'Deep Maroon Shadow'],
+  ['#550000', 'Dark Red (Low-Mid)'],
+  ['#AA0000', 'Red (Low Intensity)'],
+  ['#AA5500', 'Brown (Low Intensity)'],
+  ['#FF5555', 'Bright Red (High Intensity)'],
+  ['#D48000', 'Amber Ochre'],
+  ['#AAAAAA', 'Light Gray'],
+  ['#FFAA55', 'Peach Warm Highlight'],
+  ['#FFFF55', 'Bright Yellow (High Intensity)'],
+  ['#FFFFFF', 'Bright White'],
+];
+
+// IBM CGA 160x100 Composite Mode (16 NTSC Artifact Colors)
+export const CGA_COMPOSITE_16_COLORS: [string, string][] = [
+  ['#000000', 'Black'],
+  ['#1E370A', 'Dark Green'],
+  ['#3E1E5F', 'Dark Violet'],
+  ['#583569', 'Medium Violet'],
+  ['#0C4D35', 'Teal Green'],
+  ['#2E5040', 'Olive Gray'],
+  ['#8E3006', 'Dark Ochre'],
+  ['#B85816', 'Orange Rust'],
+  ['#0060AA', 'CGA Blue'],
+  ['#357FC6', 'Light Sky Blue'],
+  ['#8765A7', 'Lavender'],
+  ['#B87CD6', 'Pink Lilac'],
+  ['#5DB004', 'Chartreuse Green'],
+  ['#80C828', 'Bright Lime'],
+  ['#C0BD40', 'Sand Yellow'],
+  ['#FFFFFF', 'White'],
+];
+
 // Windows 16 (Standard Windows 3.1 & Windows 95 16-color VGA palette)
 export const WINDOWS_16_COLORS: [string, string][] = [
   ['#000000', 'Black'],
@@ -565,6 +645,10 @@ export const ENDESGA_16_COLORS: [string, string][] = [
 export const ALL_PALETTES: Palette[] = [
   // Classic Hardware
   createPaletteList('ega-standard', 'IBM EGA Standard', 'Classic Hardware', 'The authentic 16-color Enhanced Graphics Adapter palette (1984), standard for classic DOS gaming and early PC pixel art.', EGA_STANDARD_COLORS),
+  createPaletteList('cga-mode4-cyan', 'CGA Mode 4 (Cyan / Magenta)', 'Classic Hardware', 'The world-famous 1980s DOS CGA gaming palette featuring Black, Cyan, Magenta, and White across 16 dither levels.', CGA_MODE4_CYAN_MAGENTA_COLORS),
+  createPaletteList('cga-mode4-green', 'CGA Mode 4 (Green / Red)', 'Classic Hardware', 'The classic CGA Palette 0 gaming standard featuring Black, Green, Red, and Yellow across 16 dither levels.', CGA_MODE4_GREEN_RED_COLORS),
+  createPaletteList('cga-rgbi', 'IBM CGA 16-Color RGBI', 'Classic Hardware', 'Authentic 1981 IBM Color Graphics Adapter 16-color digital RGBI monitor palette.', CGA_RGBI_COLORS),
+  createPaletteList('cga-composite', 'CGA Composite (160×100)', 'Classic Hardware', 'Legendary 16-color NTSC artifact palette produced by IBM CGA composite monitors in 160×100 mode.', CGA_COMPOSITE_16_COLORS),
   createPaletteList('qbasic-16', 'Microsoft QBasic 16 (OUT &H3C8/9)', 'Classic Hardware', 'Standard 16-color palette for MS-DOS QBasic / QuickBASIC (SCREEN 7, 9, 12) with hardware I/O ports &H3C8/&H3C9.', QBASIC_16_COLORS),
   createPaletteList('ega-alt', 'IBM EGA / CGA Alternative', 'Classic Hardware', 'CGA RGBI alternative with olive dark yellow in place of brown.', EGA_ALT_COLORS),
 
