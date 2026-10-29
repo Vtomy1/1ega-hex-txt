@@ -19,8 +19,24 @@ export const PalettesGuide: React.FC<PalettesGuideProps> = ({
   onSelectPalette,
   onGoToConverter,
 }) => {
+  const [activeCategory, setActiveCategory] = React.useState<string>('all');
+
+  const categories = [
+    { id: 'all', label: `All Palettes (${ALL_PALETTES.length})` },
+    { id: 'Classic Hardware', label: 'Classic Hardware' },
+    { id: 'Retro Computers', label: 'Retro Computers' },
+    { id: 'Consoles', label: 'Consoles' },
+    { id: 'Monochrome & Grayscale', label: 'Monochrome' },
+    { id: 'Modern Retro', label: 'Modern Pixel Art' },
+  ];
+
+  const filteredPalettes = React.useMemo(() => {
+    if (activeCategory === 'all') return ALL_PALETTES;
+    return ALL_PALETTES.filter((p) => p.category === activeCategory);
+  }, [activeCategory]);
+
   return (
-    <div className="max-w-6xl mx-auto flex flex-col gap-8 py-6 px-4">
+    <div className="max-w-6xl mx-auto flex flex-col gap-6 py-6 px-4">
       <div className="flex flex-col gap-2">
         <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-400">
           <span>Palette Repository</span>
@@ -31,12 +47,29 @@ export const PalettesGuide: React.FC<PalettesGuideProps> = ({
           Retro 16-Color & EGA Palettes
         </h1>
         <p className="text-sm text-neutral-400 max-w-3xl leading-relaxed">
-          The Enhanced Graphics Adapter (EGA) standard introduced in 1984 established the 16-color 4-bit standard in personal computing. Explore the official IBM BIOS color assignments alongside iconic 8-bit and 16-bit computer palettes.
+          The Enhanced Graphics Adapter (EGA) standard introduced in 1984 established the 16-color 4-bit standard in personal computing. Explore official IBM BIOS color assignments alongside iconic 8-bit / 16-bit computer palettes, consoles, and modern pixel art benchmarks.
         </p>
       </div>
 
+      {/* Category filter tabs */}
+      <div className="flex flex-wrap items-center gap-1.5 p-1 bg-[#121624] border border-neutral-800/80 rounded-lg">
+        {categories.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setActiveCategory(c.id)}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors cursor-pointer whitespace-nowrap ${
+              activeCategory === c.id
+                ? 'bg-indigo-600 text-white shadow-sm'
+                : 'text-neutral-400 hover:text-neutral-200'
+            }`}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {ALL_PALETTES.map((pal) => {
+        {filteredPalettes.map((pal) => {
           const isSelected = currentPalette.id === pal.id;
 
           return (

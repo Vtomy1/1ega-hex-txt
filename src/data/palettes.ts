@@ -342,22 +342,262 @@ export const QBASIC_16_COLORS: [string, string][] = [
   ['#FFFFFF', '15: High-Intensity White'],
 ];
 
+// Atari ST 16-Color Standard GEM Desktop Palette (1985)
+export const ATARI_ST_COLORS: [string, string][] = [
+  ['#FFFFFF', 'White'],
+  ['#000000', 'Black'],
+  ['#FF0000', 'Red'],
+  ['#00FF00', 'Green'],
+  ['#0000FF', 'Blue'],
+  ['#00FFFF', 'Cyan'],
+  ['#FFFF00', 'Yellow'],
+  ['#FF00FF', 'Magenta'],
+  ['#B4B4B4', 'Silver / Low White'],
+  ['#707070', 'Dark Gray'],
+  ['#800000', 'Dark Red'],
+  ['#008000', 'Dark Green'],
+  ['#000080', 'Dark Blue'],
+  ['#008080', 'Dark Cyan'],
+  ['#808000', 'Dark Yellow / Olive'],
+  ['#800080', 'Dark Magenta'],
+];
+
+// Commodore Amiga 16-Color OCS Workbench 1.3 & Gaming Palette (1985)
+export const AMIGA_16_COLORS: [string, string][] = [
+  ['#0055AA', 'Amiga Workbench Blue'],
+  ['#FFFFFF', 'White'],
+  ['#000000', 'Black'],
+  ['#FFAA00', 'Orange Amber'],
+  ['#008800', 'Forest Green'],
+  ['#55FF55', 'Bright Green'],
+  ['#880000', 'Brick Crimson'],
+  ['#FF4444', 'Bright Red'],
+  ['#000055', 'Midnight Navy'],
+  ['#55AAFF', 'Sky Blue'],
+  ['#884400', 'Leather Brown'],
+  ['#FFFF55', 'Light Yellow'],
+  ['#555555', 'Dark Charcoal'],
+  ['#AAAAAA', 'Light Silver'],
+  ['#AA00AA', 'Deep Purple'],
+  ['#FFAAFF', 'Pastel Pink'],
+];
+
+// Amstrad CPC 16-Color Mode 0 Palette (1984)
+export const AMSTRAD_CPC_COLORS: [string, string][] = [
+  ['#000000', 'Black'],
+  ['#000080', 'Navy Blue'],
+  ['#0000FF', 'Bright Blue'],
+  ['#800000', 'Maroon'],
+  ['#800080', 'Purple'],
+  ['#8000FF', 'Mauve'],
+  ['#FF0000', 'Bright Red'],
+  ['#FF00FF', 'Bright Magenta'],
+  ['#008000', 'Forest Green'],
+  ['#008080', 'Teal'],
+  ['#0080FF', 'Sky Blue'],
+  ['#00FF00', 'Lime Green'],
+  ['#00FF80', 'Sea Green'],
+  ['#00FFFF', 'Bright Cyan'],
+  ['#FFFF00', 'Pastel Yellow'],
+  ['#FFFFFF', 'Bright White'],
+];
+
+// MSX 1 / TI-99/4A / ColecoVision (Texas Instruments TMS9918 16 Colors)
+export const MSX_TMS9918_COLORS: [string, string][] = [
+  ['#000000', 'Black'],
+  ['#21C842', 'Medium Green'],
+  ['#5EDC78', 'Light Green'],
+  ['#5455ED', 'Dark Blue'],
+  ['#7D76FC', 'Light Blue'],
+  ['#D4524D', 'Dark Red'],
+  ['#42EBF5', 'Cyan'],
+  ['#FC5554', 'Medium Red'],
+  ['#FF7978', 'Light Red'],
+  ['#D4C154', 'Dark Yellow'],
+  ['#E6CE80', 'Light Yellow'],
+  ['#21B03B', 'Dark Green'],
+  ['#C95BBA', 'Magenta'],
+  ['#CCCCCC', 'Light Gray'],
+  ['#555555', 'Dark Gray'],
+  ['#FFFFFF', 'White'],
+];
+
+// Apple Macintosh II / System 7 Color QuickDraw 16 Colors (1987)
+export const MAC_SYSTEM7_COLORS: [string, string][] = [
+  ['#FFFFFF', 'White'],
+  ['#FBF305', 'Lemon Yellow'],
+  ['#FF6403', 'Bright Orange'],
+  ['#DD0806', 'Carmine Red'],
+  ['#F20884', 'Hot Magenta'],
+  ['#4600A5', 'Royal Purple'],
+  ['#0000D4', 'Cobalt Blue'],
+  ['#02ABE9', 'Sky Cyan'],
+  ['#1FB714', 'Apple Green'],
+  ['#006411', 'Forest Green'],
+  ['#562C05', 'Wood Brown'],
+  ['#90713A', 'Tan Ochre'],
+  ['#C0C0C0', 'System Platinum'],
+  ['#808080', 'Medium Gray'],
+  ['#404040', 'Dark Slate'],
+  ['#000000', 'Black'],
+];
+
+// NES / Famicom 16 Colors (Curated 2C02 PPU Master Palette)
+export const NES_16_COLORS: [string, string][] = [
+  ['#000000', 'Void Black'],
+  ['#001088', 'Dark Cobalt'],
+  ['#0020A8', 'Nintendo Blue'],
+  ['#44009C', 'Royal Purple'],
+  ['#880000', 'Deep Crimson'],
+  ['#A81000', 'Famicom Red'],
+  ['#A84000', 'Fire Orange'],
+  ['#507800', 'Olive Ochre'],
+  ['#007800', 'Overworld Green'],
+  ['#006838', 'Forest Teal'],
+  ['#005858', 'Pipe Cyan'],
+  ['#004058', 'Night Slate'],
+  ['#FC9838', 'Peach Skin'],
+  ['#FCE0A8', 'Coin Pale Yellow'],
+  ['#7C7C7C', 'Stone Gray'],
+  ['#FFFFFF', 'Pure White'],
+];
+
+// Sega Master System / Game Gear 16-Color Palette
+export const SMS_16_COLORS: [string, string][] = [
+  ['#000000', 'Black'],
+  ['#0000AA', 'Deep Blue'],
+  ['#0000FF', 'Sonic Blue'],
+  ['#00AA00', 'Forest Green'],
+  ['#00FF00', 'Emerald Green'],
+  ['#00AAAA', 'Teal'],
+  ['#00FFFF', 'Cyan'],
+  ['#AA0000', 'Maroon'],
+  ['#FF0000', 'Vibrant Red'],
+  ['#AA00AA', 'Purple'],
+  ['#FF00FF', 'Hot Magenta'],
+  ['#AA5500', 'Brown'],
+  ['#FFAA00', 'Orange'],
+  ['#FFFF00', 'Bright Yellow'],
+  ['#AAAAAA', 'Light Gray'],
+  ['#FFFFFF', 'Pure White'],
+];
+
+// Game Boy Color Curated 16 Colors
+export const GBC_16_COLORS: [string, string][] = [
+  ['#081820', 'Deep Ink'],
+  ['#346856', 'Sea Green'],
+  ['#88C070', 'Sage Green'],
+  ['#E0F8D0', 'Pale Meadow'],
+  ['#000000', 'Black'],
+  ['#003888', 'Sapphire'],
+  ['#0088FF', 'Cyan Blue'],
+  ['#88D8FF', 'Ice Blue'],
+  ['#680000', 'Dark Crimson'],
+  ['#B80000', 'Scarlet'],
+  ['#F83800', 'Vermilion'],
+  ['#F8A800', 'Gold Amber'],
+  ['#F8F800', 'Yellow'],
+  ['#888888', 'Slate Gray'],
+  ['#D8D8D8', 'Silver'],
+  ['#FFFFFF', 'White'],
+];
+
+// DawnBringer 16 (DB16 - Legendary Benchmark Pixel Art Palette)
+export const DAWNBRINGER_16_COLORS: [string, string][] = [
+  ['#140C1C', 'Black Plum'],
+  ['#442434', 'Dark Wine'],
+  ['#30346D', 'Midnight Blue'],
+  ['#4E4A4E', 'Slate Gray'],
+  ['#854C30', 'Leather Brown'],
+  ['#346524', 'Deep Green'],
+  ['#D04648', 'Brick Red'],
+  ['#757161', 'Khaki Stone'],
+  ['#597DCE', 'Periwinkle Blue'],
+  ['#D27D2C', 'Warm Amber'],
+  ['#8595A1', 'Cool Mist Gray'],
+  ['#6DAA2C', 'Moss Green'],
+  ['#D2A474', 'Sand Tan'],
+  ['#4FA4B8', 'Aqua Blue'],
+  ['#92E8C0', 'Pale Mint'],
+  ['#F7E7C4', 'Cream White'],
+];
+
+// Sweetie 16 (GrafxKid - Top Rated Lospec Palette)
+export const SWEETIE_16_COLORS: [string, string][] = [
+  ['#1A1C2C', 'Space Cadet Navy'],
+  ['#5D275D', 'Purple Jam'],
+  ['#B13E53', 'Crimson Rose'],
+  ['#EF7D57', 'Salmon Coral'],
+  ['#FFCD75', 'Butterscotch'],
+  ['#A7F070', 'Lime Sorbet'],
+  ['#38B764', 'Shamrock Green'],
+  ['#257179', 'Deep Seaweed'],
+  ['#29366F', 'Bluebonnet'],
+  ['#3B5DC9', 'Cobalt Ice'],
+  ['#41A6F6', 'Sky Blue'],
+  ['#73EFF7', 'Pastel Aqua'],
+  ['#F4F4F4', 'Sugar White'],
+  ['#94B0C2', 'Silver Cloud'],
+  ['#566C86', 'Storm Gray'],
+  ['#333C57', 'Blue Stone'],
+];
+
+// Endesga 16 (EDG 16 - Handcrafted Pixel Palette)
+export const ENDESGA_16_COLORS: [string, string][] = [
+  ['#193C3E', 'Deep Abyssal'],
+  ['#265C42', 'Pine Forest'],
+  ['#3E8948', 'Leaf Green'],
+  ['#63C74D', 'Vibrant Sprout'],
+  ['#FEE761', 'Lemon Yellow'],
+  ['#FEAE34', 'Orange Peel'],
+  ['#F77622', 'Rust Fire'],
+  ['#E43B44', 'Ruby Red'],
+  ['#A22633', 'Dark Berry'],
+  ['#3E2731', 'Aubergine'],
+  ['#733E39', 'Roast Umber'],
+  ['#B86F50', 'Clay Terracotta'],
+  ['#E4A672', 'Peach Skin'],
+  ['#0099DB', 'Cyan River'],
+  ['#2CE8F5', 'Electric Aqua'],
+  ['#FFFFFF', 'Pure White'],
+];
+
 export const ALL_PALETTES: Palette[] = [
+  // Classic Hardware
   createPaletteList('ega-standard', 'IBM EGA Standard', 'Classic Hardware', 'The authentic 16-color Enhanced Graphics Adapter palette (1984), standard for classic DOS gaming and early PC pixel art.', EGA_STANDARD_COLORS),
   createPaletteList('qbasic-16', 'Microsoft QBasic 16 (OUT &H3C8/9)', 'Classic Hardware', 'Standard 16-color palette for MS-DOS QBasic / QuickBASIC (SCREEN 7, 9, 12) with hardware I/O ports &H3C8/&H3C9.', QBASIC_16_COLORS),
+  createPaletteList('ega-alt', 'IBM EGA / CGA Alternative', 'Classic Hardware', 'CGA RGBI alternative with olive dark yellow in place of brown.', EGA_ALT_COLORS),
+
+  // Retro Computers
+  createPaletteList('c64', 'Commodore 64', 'Retro Computers', 'The iconic 16-color palette of the Commodore 64 home computer (1982).', C64_COLORS),
+  createPaletteList('amiga-16', 'Commodore Amiga (OCS 16)', 'Retro Computers', 'Classic 16-color palette from the Commodore Amiga 500/1000/2000 OCS generation (Workbench 1.3).', AMIGA_16_COLORS),
+  createPaletteList('atari-st', 'Atari ST (GEM 16)', 'Retro Computers', 'The standard 16-color GEM desktop and game palette of the Atari ST/STE family (1985).', ATARI_ST_COLORS),
+  createPaletteList('amstrad-cpc', 'Amstrad CPC (Mode 0)', 'Retro Computers', 'Iconic 16-color Mode 0 (160x200) palette of the Amstrad CPC 464/6128 home computers (1984).', AMSTRAD_CPC_COLORS),
+  createPaletteList('msx-tms9918', 'MSX 1 / TMS9918', 'Retro Computers', 'Texas Instruments TMS9918 VDP 16-color palette used in MSX 1, TI-99/4A, ColecoVision, and SG-1000.', MSX_TMS9918_COLORS),
+  createPaletteList('apple-ii', 'Apple II Composite', 'Retro Computers', 'Classic 16-color palette of the Apple II computer line (NTSC composite color artifacts).', APPLE_II_COLORS),
+  createPaletteList('mac-system7', 'Macintosh System 7 (16 Colors)', 'Retro Computers', 'Standard 16-color QuickDraw palette of classic Apple Macintosh II systems (1987-1991).', MAC_SYSTEM7_COLORS),
+  createPaletteList('zx-spectrum', 'ZX Spectrum (16 Colors)', 'Retro Computers', 'Sinclair ZX Spectrum 8 standard colors plus 8 bright intensity counterparts.', ZX_SPECTRUM_COLORS),
+  createPaletteList('windows-16', 'Windows 16 (VGA/EGA)', 'Retro Computers', 'Standard 16-color VGA/EGA palette used by Windows 3.1, Windows 95, and Paint.', WINDOWS_16_COLORS),
+
+  // Consoles
+  createPaletteList('nes-16', 'NES / Famicom (16 Colors)', 'Consoles', 'Curated 16-color palette from the iconic Nintendo Entertainment System Ricoh 2C02 PPU.', NES_16_COLORS),
+  createPaletteList('sms-16', 'Sega Master System (16 Colors)', 'Consoles', 'Vibrant 16-color tile and sprite palette of the Sega Master System and Game Gear (1985).', SMS_16_COLORS),
+  createPaletteList('gbc-16', 'Game Boy Color (16 Colors)', 'Consoles', 'Curated 16-color palette representative of the Nintendo Game Boy Color handheld hardware.', GBC_16_COLORS),
+  createPaletteList('gameboy-16', 'Game Boy Olive Ramp', 'Consoles', 'Extended 16-shade monochrome olive ramp inspired by the original Nintendo Game Boy LCD.', GAMEBOY_16_COLORS),
+
+  // Monochrome & Grayscale
   createPaletteList('grayscale-16', '16-Level Grayscale', 'Monochrome & Grayscale', 'Linear 16-shade monochrome ramp from black (0) to white (F). Perfect for classic NeXTstation, 4-bit monochrome monitors, and e-ink displays.', GRAYSCALE_16_COLORS),
   createPaletteList('amber-16', 'Amber Phosphor CRT', 'Monochrome & Grayscale', 'Classic 16-shade warm amber monochrome CRT phosphor gradient.', AMBER_16_COLORS),
   createPaletteList('green-phosphor-16', 'IBM 5151 Green Phosphor', 'Monochrome & Grayscale', 'Iconic 16-shade P39 green phosphor CRT monitor monochrome ramp.', GREEN_PHOSPHOR_16_COLORS),
-  createPaletteList('ega-alt', 'IBM EGA / CGA Alternative', 'Classic Hardware', 'CGA RGBI alternative with olive dark yellow in place of brown.', EGA_ALT_COLORS),
-  createPaletteList('windows-16', 'Windows 16 (VGA/EGA)', 'Retro Computers', 'Standard 16-color VGA/EGA palette used by Windows 3.1, Windows 95, and Paint.', WINDOWS_16_COLORS),
-  createPaletteList('c64', 'Commodore 64', 'Retro Computers', 'The iconic 16-color palette of the Commodore 64 home computer (1982).', C64_COLORS),
+
+  // Modern Retro
+  createPaletteList('dawnbringer-16', 'DawnBringer 16 (DB16)', 'Modern Retro', 'The world-famous 16-color benchmark pixel art palette engineered by DawnBringer for perfect harmony.', DAWNBRINGER_16_COLORS),
+  createPaletteList('sweetie-16', 'Sweetie 16 (GrafxKid)', 'Modern Retro', 'Highly popular vibrant 16-color retro gaming palette created by GrafxKid for joyful pixel scenes.', SWEETIE_16_COLORS),
+  createPaletteList('endesga-16', 'Endesga 16 (EDG 16)', 'Modern Retro', 'Acclaimed 16-color palette by master pixel artist Endesga with natural greens and earthy tones.', ENDESGA_16_COLORS),
   createPaletteList('pico-8', 'PICO-8 Fantasy Console', 'Modern Retro', 'Curated 16-color palette engineered by Joseph White for the PICO-8 fantasy console.', PICO8_COLORS),
-  createPaletteList('apple-ii', 'Apple II Composite', 'Retro Computers', 'Classic 16-color palette of the Apple II computer line (NTSC composite color artifacts).', APPLE_II_COLORS),
-  createPaletteList('zx-spectrum', 'ZX Spectrum (16 Colors)', 'Retro Computers', 'Sinclair ZX Spectrum 8 standard colors plus 8 bright intensity counterparts.', ZX_SPECTRUM_COLORS),
   createPaletteList('cyberpunk', 'Cyberpunk Neon 16', 'Modern Retro', 'High-contrast synthetic palette with vivid neons, deep voids, and electric accents.', CYBERPUNK_16_COLORS),
   createPaletteList('monokai', 'Monokai 16', 'Modern Retro', 'Classic code editor palette adapted for balanced 4-bit graphical quantization.', MONOKAI_16_COLORS),
   createPaletteList('solarized', 'Solarized 16', 'Modern Retro', 'Ethan Schoonover\'s precision palette engineered for optimal perceptual contrast.', SOLARIZED_16_COLORS),
-  createPaletteList('gameboy-16', 'Game Boy Olive Ramp', 'Consoles', 'Extended 16-shade monochrome olive ramp inspired by the original Nintendo Game Boy LCD.', GAMEBOY_16_COLORS),
 ];
 
 export const DEFAULT_PALETTE_ID = 'ega-standard';
