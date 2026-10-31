@@ -4,12 +4,12 @@
  */
 
 import React from 'react';
-import { Download, FileCode, Sliders, Palette as PaletteIcon, HelpCircle } from 'lucide-react';
+import { Download, FileCode, Sliders, Palette as PaletteIcon, Layers } from 'lucide-react';
 
 interface HeaderProps {
   onDownloadTxt: () => void;
-  activeTab: 'converter' | 'palettes' | 'export-docs';
-  setActiveTab: (tab: 'converter' | 'palettes' | 'export-docs') => void;
+  activeTab: 'converter' | 'batch' | 'palettes' | 'export-docs';
+  setActiveTab: (tab: 'converter' | 'batch' | 'palettes' | 'export-docs') => void;
   width: number;
   height: number;
   paletteName: string;
@@ -46,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
       <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-neutral-400">
         <button
           onClick={() => setActiveTab('converter')}
-          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 ${
+          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 cursor-pointer ${
             activeTab === 'converter'
               ? 'text-indigo-400 border-b-2 border-indigo-500 font-semibold'
               : 'hover:text-neutral-200'
@@ -56,8 +56,19 @@ export const Header: React.FC<HeaderProps> = ({
           <span>Converter & Viewport</span>
         </button>
         <button
+          onClick={() => setActiveTab('batch')}
+          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 cursor-pointer ${
+            activeTab === 'batch'
+              ? 'text-indigo-400 border-b-2 border-indigo-500 font-semibold'
+              : 'hover:text-neutral-200'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Batch Processor</span>
+        </button>
+        <button
           onClick={() => setActiveTab('palettes')}
-          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 ${
+          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 cursor-pointer ${
             activeTab === 'palettes'
               ? 'text-indigo-400 border-b-2 border-indigo-500 font-semibold'
               : 'hover:text-neutral-200'
@@ -68,7 +79,7 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
         <button
           onClick={() => setActiveTab('export-docs')}
-          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 ${
+          className={`flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0 py-1 cursor-pointer ${
             activeTab === 'export-docs'
               ? 'text-indigo-400 border-b-2 border-indigo-500 font-semibold'
               : 'hover:text-neutral-200'

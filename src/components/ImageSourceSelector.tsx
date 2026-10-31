@@ -4,7 +4,7 @@
  */
 
 import React, { useRef } from 'react';
-import { Upload, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Upload, Sparkles, Layers } from 'lucide-react';
 
 interface SampleItem {
   id: string;
@@ -37,11 +37,13 @@ const SAMPLES: SampleItem[] = [
 interface ImageSourceSelectorProps {
   onLoadImage: (imgUrl: string) => void;
   activeSampleId?: string;
+  onOpenBatch?: () => void;
 }
 
 export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
   onLoadImage,
   activeSampleId,
+  onOpenBatch,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -94,6 +96,17 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
           <Upload className="w-3.5 h-3.5 text-indigo-400" />
           <span>Upload Image</span>
         </button>
+
+        {onOpenBatch && (
+          <button
+            onClick={onOpenBatch}
+            className="flex items-center gap-2 px-3 py-1.5 bg-[#171e33] hover:bg-[#202947] text-indigo-300 border border-indigo-500/40 rounded-lg text-xs font-medium transition-colors cursor-pointer"
+            title="Batch process multiple images at once"
+          >
+            <Layers className="w-3.5 h-3.5 text-indigo-400" />
+            <span>Batch Mode</span>
+          </button>
+        )}
 
         <span className="hidden sm:inline text-[11px] text-neutral-400">
           Drop any image or paste (<kbd className="font-mono text-neutral-300">Ctrl+V</kbd>)

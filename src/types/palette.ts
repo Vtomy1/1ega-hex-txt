@@ -77,3 +77,28 @@ export interface PixelHoverInfo {
   paletteHex: string;
   originalRgb?: [number, number, number];
 }
+
+export interface BatchImageItem {
+  id: string;
+  filename: string;
+  fileSize?: number;
+  sourceUrl: string;
+  imgElement?: HTMLImageElement;
+  status: 'pending' | 'processing' | 'done' | 'error';
+  errorMessage?: string;
+  processed?: ProcessedImageData;
+  thumbnailCanvasUrl?: string;
+  originalWidth?: number;
+  originalHeight?: number;
+}
+
+export type BatchCommentStyle = 'semicolon' | 'c-slash' | 'hash' | 'rem';
+
+export interface BatchExportOptions {
+  format: ExportFormat;
+  commentStyle: BatchCommentStyle;
+  includeGlobalHeader: boolean;
+  includeFileStats: boolean;
+  uppercase: boolean;
+  lineWrap?: number;
+}

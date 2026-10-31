@@ -184,18 +184,29 @@ uint8_t pixel_right = byte & 0x0F;        // -> 15 (0xF)`}
         <div className="bg-[#121624] border border-neutral-800/80 rounded-xl p-5 flex flex-col gap-3 md:col-span-2">
           <div className="flex items-center gap-2 text-white font-bold text-xs uppercase">
             <Terminal className="w-4 h-4 text-emerald-400" />
-            <span>Python Reading .txt Export</span>
+            <span>Python Reading .txt Export (Single or Batch)</span>
           </div>
           <pre className="p-3 bg-[#080a10] rounded-lg font-mono text-xs text-neutral-300 overflow-x-auto leading-relaxed">
-{`# Read hex lines from exported .txt
+{`# 1. Single file reading:
 with open("ega-image.txt") as f:
     lines = [line.strip() for line in f if not line.startswith(";")]
 
 # Parse 0-F character into 0-15 integers
-pixel_matrix = [
-    [int(char, 16) for char in row]
-    for row in lines
-]`}
+pixel_matrix = [[int(char, 16) for char in row] for row in lines]
+
+# 2. Batch combined file reading with filename comments:
+# Lines starting with '; FILE: <filename>' demarcate individual images
+images = {}
+current_file = None
+
+with open("batch-ega-4bit-export.txt") as f:
+    for line in f:
+        line = line.strip()
+        if "FILE:" in line:
+            current_file = line.split("FILE:")[1].strip()
+            images[current_file] = []
+        elif line and not line.startswith(";") and current_file:
+            images[current_file].append([int(ch, 16) for ch in line])`}
           </pre>
         </div>
       </div>

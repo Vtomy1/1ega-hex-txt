@@ -14,6 +14,7 @@ import { HexExportDrawer } from './components/HexExportDrawer';
 import { PalettesGuide } from './components/PalettesGuide';
 import { FormatGuide } from './components/FormatGuide';
 import { ColorHistogram } from './components/ColorHistogram';
+import { BatchProcessor } from './components/BatchProcessor';
 import {
   ColorMetric,
   DitherAlgorithm,
@@ -31,7 +32,7 @@ import { formatHexData, downloadTextFile } from './utils/export';
 const DEFAULT_SAMPLE_URL = '/src/assets/images/sample_pixel_hero_1792891947606.jpg';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'converter' | 'palettes' | 'export-docs'>('converter');
+  const [activeTab, setActiveTab] = useState<'converter' | 'batch' | 'palettes' | 'export-docs'>('converter');
 
   // Image source state
   const [imageSrc, setImageSrc] = useState<string>(DEFAULT_SAMPLE_URL);
@@ -285,6 +286,7 @@ export default function App() {
                 else if (url.includes('sample_arcade_scene')) setActiveSampleId('arcade');
                 else setActiveSampleId('');
               }}
+              onOpenBatch={() => setActiveTab('batch')}
             />
 
             {/* 16-Color Palette Bar */}
@@ -399,6 +401,22 @@ export default function App() {
               ditherCanvas={originalResizedCanvas}
             />
           </div>
+        ) : activeTab === 'batch' ? (
+          <BatchProcessor
+            currentPalette={
+              isCustomPalette
+                ? {
+                    id: 'custom-palette',
+                    name: 'Custom User Palette',
+                    category: 'Custom',
+                    description: 'User-customized 16-color 4-bit palette',
+                    colors: customColors,
+                  }
+                : currentPalette
+            }
+            defaultWidth={width}
+            defaultHeight={height}
+          />
         ) : activeTab === 'palettes' ? (
           <PalettesGuide
             currentPalette={currentPalette}
