@@ -15,6 +15,7 @@ import { PalettesGuide } from './components/PalettesGuide';
 import { FormatGuide } from './components/FormatGuide';
 import { ColorHistogram } from './components/ColorHistogram';
 import { BatchProcessor } from './components/BatchProcessor';
+import { PresetManagerModal } from './components/PresetManagerModal';
 import {
   ColorMetric,
   DitherAlgorithm,
@@ -22,8 +23,11 @@ import {
   ImageAdjustments,
   Palette,
   PaletteColor,
+  PresetSettings,
   ProcessedImageData,
+  QuickFilterType,
   ResampleFilter,
+  UserPreset,
 } from './types/palette';
 import { ALL_PALETTES, EGA_STANDARD_COLORS, hexToRgb, HEX_DIGITS } from './data/palettes';
 import { processImageToHex4Bit, renderResizedImageToCanvas } from './utils/dither';
@@ -40,6 +44,10 @@ export default function App() {
   const [sourceImgElement, setSourceImgElement] = useState<HTMLImageElement | null>(null);
   const [originalWidth, setOriginalWidth] = useState<number>(0);
   const [originalHeight, setOriginalHeight] = useState<number>(0);
+
+  // Quick Filters state (Pre-quantization image processing presets)
+  const [activeFilter, setActiveFilter] = useState<QuickFilterType>('none');
+  const [filterStrength, setFilterStrength] = useState<number>(1.0);
 
   // Dimensions state
   const [width, setWidth] = useState<number>(64);
@@ -80,6 +88,11 @@ export default function App() {
   const [originalResizedCanvas, setOriginalResizedCanvas] = useState<HTMLCanvasElement | null>(null);
   const [processedData, setProcessedData] = useState<ProcessedImageData | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+  // Preset Manager Modal & Active Preset tracking
+  const [isPresetModalOpen, setIsPresetModalOpen] = useState<boolean>(false);
+  const [activePresetId, setActivePresetId] = useState<string | null>('factory-ega-classic');
+  const [activePresetName, setActivePresetName] = useState<string | null>('DOS EGA Gamer');
 
   // Load Image Element
   useEffect(() => {
@@ -128,13 +141,15 @@ export default function App() {
     try {
       setIsProcessing(true);
 
-      // 1. Resize image onto intermediate canvas
+      // 1. Resize image onto intermediate canvas with Quick Filter pre-processing
       const resizedCanvas = renderResizedImageToCanvas(
         sourceImgElement,
         width,
         height,
         fitMode,
-        resampleFilter
+        resampleFilter,
+        activeFilter,
+        filterStrength
       );
       setOriginalResizedCanvas(resizedCanvas);
 
@@ -163,6 +178,8 @@ export default function App() {
     height,
     fitMode,
     resampleFilter,
+    activeFilter,
+    filterStrength,
     isCustomPalette,
     customColors,
     currentPalette,
@@ -236,6 +253,61 @@ export default function App() {
     });
   };
 
+  // Apply a selected preset (User or Factory)
+  const handleApplyPreset = (preset: UserPreset) => {
+    // Dithering & Color Engine
+    setAlgorithm(preset.settings.algorithm);
+    setDitherIntensity(preset.settings.ditherIntensity);
+    setColorMetric(preset.settings.colorMetric);
+    setFitMode(preset.settings.fitMode);
+    setResampleFilter(preset.settings.resampleFilter);
+    setAdjustments(preset.settings.adjustments);
+
+    // Pre-processing Quick Filter
+    setActiveFilter(preset.settings.quickFilter || 'none');
+    setFilterStrength(preset.settings.filterStrength ?? 1.0);
+
+    // Resolution dimensions if specified in preset
+    if (preset.settings.width && preset.settings.height) {
+      setWidth(preset.settings.width);
+      setHeight(preset.settings.height);
+    }
+
+    // Palette loading
+    if (preset.settings.isCustomPalette && preset.settings.customColors && preset.settings.customColors.length > 0) {
+      setCustomColors(preset.settings.customColors);
+      setIsCustomPalette(true);
+    } else {
+      const found = ALL_PALETTES.find((p) => p.id === preset.settings.paletteId);
+      if (found) {
+        setCurrentPalette(found);
+        setIsCustomPalette(false);
+      } else {
+        setIsCustomPalette(false);
+        setCurrentPalette(ALL_PALETTES[0]);
+      }
+    }
+
+    setActivePresetId(preset.id);
+    setActivePresetName(preset.name);
+  };
+
+  const currentPresetSettings: PresetSettings = {
+    algorithm,
+    ditherIntensity,
+    colorMetric,
+    fitMode,
+    resampleFilter,
+    adjustments,
+    paletteId: isCustomPalette ? 'custom' : currentPalette.id,
+    isCustomPalette,
+    customColors: isCustomPalette ? customColors : undefined,
+    quickFilter: activeFilter,
+    filterStrength,
+    width,
+    height,
+  };
+
   // Top action: Download .txt immediately
   const handleDownloadTxt = () => {
     if (!processedData) return;
@@ -270,6 +342,8 @@ export default function App() {
         width={width}
         height={height}
         paletteName={isCustomPalette ? 'Custom 16' : currentPalette.name}
+        onOpenPresets={() => setIsPresetModalOpen(true)}
+        activePresetName={activePresetName}
       />
 
       {/* Main Content Viewports */}
@@ -287,6 +361,10 @@ export default function App() {
                 else setActiveSampleId('');
               }}
               onOpenBatch={() => setActiveTab('batch')}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              filterStrength={filterStrength}
+              onFilterStrengthChange={setFilterStrength}
             />
 
             {/* 16-Color Palette Bar */}
@@ -341,6 +419,7 @@ export default function App() {
                   adjustments={adjustments}
                   onAdjustmentsChange={setAdjustments}
                   onResetAdjustments={handleResetAdjustments}
+                  onOpenPresets={() => setIsPresetModalOpen(true)}
                 />
               </div>
 
@@ -444,6 +523,16 @@ export default function App() {
           <span>Client-side Canvas Processing</span>
         </div>
       </footer>
+
+      {/* Preset Manager Modal Dialog */}
+      <PresetManagerModal
+        isOpen={isPresetModalOpen}
+        onClose={() => setIsPresetModalOpen(false)}
+        currentSettings={currentPresetSettings}
+        currentPaletteName={isCustomPalette ? 'Custom 16' : currentPalette.name}
+        onApplyPreset={handleApplyPreset}
+        activePresetId={activePresetId}
+      />
     </div>
   );
 }

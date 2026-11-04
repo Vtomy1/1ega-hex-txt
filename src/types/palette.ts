@@ -38,6 +38,25 @@ export type FitMode = 'contain' | 'cover' | 'stretch' | 'center-crop';
 
 export type ResampleFilter = 'nearest' | 'bilinear';
 
+export type QuickFilterType =
+  | 'none'
+  | 'grayscale'
+  | 'sepia'
+  | 'high-contrast'
+  | 'vivid'
+  | 'vintage-warm'
+  | 'cool-cyan'
+  | 'invert'
+  | 'dramatic-dark';
+
+export interface QuickFilterPreset {
+  id: QuickFilterType;
+  name: string;
+  description: string;
+  iconBg: string;
+  tag?: string;
+}
+
 export type ExportFormat =
   | 'raw-matrix'
   | 'delimited-space'
@@ -101,4 +120,29 @@ export interface BatchExportOptions {
   includeFileStats: boolean;
   uppercase: boolean;
   lineWrap?: number;
+}
+
+export interface PresetSettings {
+  algorithm: DitherAlgorithm;
+  ditherIntensity: number;
+  colorMetric: ColorMetric;
+  fitMode: FitMode;
+  resampleFilter: ResampleFilter;
+  adjustments: ImageAdjustments;
+  paletteId: string;
+  isCustomPalette: boolean;
+  customColors?: PaletteColor[];
+  quickFilter: QuickFilterType;
+  filterStrength: number;
+  width?: number;
+  height?: number;
+}
+
+export interface UserPreset {
+  id: string;
+  name: string;
+  description?: string;
+  category: 'Factory' | 'User';
+  createdAt: number;
+  settings: PresetSettings;
 }

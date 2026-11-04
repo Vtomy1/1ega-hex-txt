@@ -10,9 +10,11 @@ import {
   ImageAdjustments,
   PaletteColor,
   ProcessedImageData,
+  QuickFilterType,
   ResampleFilter,
 } from '../types/palette';
 import { PaletteMatcher } from './color';
+import { applyQuickFilterToImageData } from './filter';
 
 // Bayer ordered dithering threshold matrices normalized to [-0.5, 0.5]
 const BAYER_2X2 = [
@@ -115,7 +117,9 @@ export function renderResizedImageToCanvas(
   targetWidth: number,
   targetHeight: number,
   fitMode: FitMode,
-  filter: ResampleFilter
+  filter: ResampleFilter,
+  quickFilter: QuickFilterType = 'none',
+  filterStrength: number = 1.0
 ): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = targetWidth;
@@ -177,6 +181,14 @@ export function renderResizedImageToCanvas(
   }
 
   ctx.drawImage(sourceImage, sx, sy, sCropW, sCropH, dx, dy, dW, dH);
+
+  // Apply Quick Filter preset (e.g. Grayscale, Sepia, High Contrast) directly to input
+  if (quickFilter !== 'none' && filterStrength > 0) {
+    const imgData = ctx.getImageData(0, 0, targetWidth, targetHeight);
+    applyQuickFilterToImageData(imgData, quickFilter, filterStrength);
+    ctx.putImageData(imgData, 0, 0);
+  }
+
   return canvas;
 }
 

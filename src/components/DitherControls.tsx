@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import { ColorMetric, DitherAlgorithm, ImageAdjustments } from '../types/palette';
-import { Sliders, Eye, ChevronDown, ChevronUp, RotateCcw } from 'lucide-react';
+import { Sliders, Eye, ChevronDown, ChevronUp, RotateCcw, Bookmark } from 'lucide-react';
 
 interface DitherControlsProps {
   algorithm: DitherAlgorithm;
@@ -17,6 +17,7 @@ interface DitherControlsProps {
   adjustments: ImageAdjustments;
   onAdjustmentsChange: (adj: ImageAdjustments) => void;
   onResetAdjustments: () => void;
+  onOpenPresets?: () => void;
 }
 
 export const DitherControls: React.FC<DitherControlsProps> = ({
@@ -29,6 +30,7 @@ export const DitherControls: React.FC<DitherControlsProps> = ({
   adjustments,
   onAdjustmentsChange,
   onResetAdjustments,
+  onOpenPresets,
 }) => {
   const [showAdjustments, setShowAdjustments] = useState(false);
 
@@ -53,7 +55,19 @@ export const DitherControls: React.FC<DitherControlsProps> = ({
           <Sliders className="w-3.5 h-3.5 text-indigo-400" />
           <span>Dithering & Color Engine</span>
         </h3>
-        <span className="text-[11px] font-mono text-neutral-400">4-Bit Quantizer</span>
+        <div className="flex items-center gap-2">
+          {onOpenPresets && (
+            <button
+              onClick={onOpenPresets}
+              className="flex items-center gap-1 px-2 py-0.5 text-[11px] font-medium text-indigo-300 hover:text-white bg-indigo-950/60 hover:bg-indigo-900/80 border border-indigo-800/60 rounded transition-colors cursor-pointer"
+              title="Open Preset Manager to load or save combinations"
+            >
+              <Bookmark className="w-3 h-3" />
+              <span>Presets</span>
+            </button>
+          )}
+          <span className="text-[11px] font-mono text-neutral-400">4-Bit Quantizer</span>
+        </div>
       </div>
 
       {/* Algorithm selector */}

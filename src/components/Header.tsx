@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Download, FileCode, Sliders, Palette as PaletteIcon, Layers } from 'lucide-react';
+import { Download, FileCode, Sliders, Palette as PaletteIcon, Layers, Bookmark } from 'lucide-react';
 
 interface HeaderProps {
   onDownloadTxt: () => void;
@@ -13,6 +13,8 @@ interface HeaderProps {
   width: number;
   height: number;
   paletteName: string;
+  onOpenPresets?: () => void;
+  activePresetName?: string | null;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -22,6 +24,8 @@ export const Header: React.FC<HeaderProps> = ({
   width,
   height,
   paletteName,
+  onOpenPresets,
+  activePresetName,
 }) => {
   return (
     <header className="flex items-center justify-between gap-8 px-6 py-3.5 bg-[#0f121d] border-b border-neutral-800/80 sticky top-0 z-40 backdrop-blur-md">
@@ -90,13 +94,30 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </nav>
 
-      {/* Zone 3: Primary Action */}
-      <div className="flex items-center gap-3 shrink-0">
+      {/* Zone 3: Primary Action & Presets */}
+      <div className="flex items-center gap-2.5 shrink-0">
         <div className="hidden lg:flex items-center gap-2 text-xs text-neutral-400 font-mono pr-2">
           <span className="text-neutral-300 font-medium">{width}×{height}</span>
           <span className="text-neutral-600">·</span>
           <span className="text-indigo-300 truncate max-w-[140px]">{paletteName}</span>
         </div>
+
+        {onOpenPresets && (
+          <button
+            onClick={onOpenPresets}
+            className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-200 bg-[#161a29] hover:bg-[#1f2438] hover:text-white rounded-lg border border-neutral-700/80 shadow-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+            title="Open Preset Manager"
+          >
+            <Bookmark className="w-4 h-4 text-indigo-400" />
+            <span>Presets</span>
+            {activePresetName && (
+              <span className="hidden xl:inline-block max-w-[110px] truncate text-[11px] text-indigo-300 font-normal">
+                ({activePresetName})
+              </span>
+            )}
+          </button>
+        )}
+
         <button
           onClick={onDownloadTxt}
           className="flex items-center gap-2 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 rounded-lg shadow-sm transition-colors whitespace-nowrap shrink-0 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo-400"

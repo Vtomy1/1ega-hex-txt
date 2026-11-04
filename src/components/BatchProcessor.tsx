@@ -30,11 +30,13 @@ import {
   FitMode,
   ImageAdjustments,
   Palette,
+  QuickFilterType,
   ResampleFilter,
 } from '../types/palette';
 import { ALL_PALETTES } from '../data/palettes';
 import { processImageToHex4Bit, renderResizedImageToCanvas } from '../utils/dither';
 import { downloadTextFile, formatBatchHexData } from '../utils/export';
+import { QUICK_FILTERS } from '../utils/filter';
 
 interface BatchProcessorProps {
   currentPalette: Palette;
@@ -89,6 +91,9 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
   const [algorithm, setAlgorithm] = useState<DitherAlgorithm>('floyd-steinberg');
   const [ditherIntensity, setDitherIntensity] = useState<number>(0.85);
   const [colorMetric] = useState<ColorMetric>('perceptual');
+
+  // Quick Filter preset for batch queue
+  const [batchFilter, setBatchFilter] = useState<QuickFilterType>('none');
 
   // Export options
   const [format, setFormat] = useState<ExportFormat>('raw-matrix');
@@ -147,7 +152,8 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
     h: number,
     algo: DitherAlgorithm,
     fit: FitMode,
-    intensity: number
+    intensity: number,
+    filterType: QuickFilterType = 'none'
   ): Promise<BatchImageItem> => {
     return new Promise((resolve) => {
       const img = new Image();
@@ -155,7 +161,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
 
       img.onload = () => {
         try {
-          const resizedCanvas = renderResizedImageToCanvas(img, w, h, fit, resampleFilter);
+          const resizedCanvas = renderResizedImageToCanvas(img, w, h, fit, resampleFilter, filterType);
           const adjustments: ImageAdjustments = {
             brightness: 0,
             contrast: 5,
@@ -242,7 +248,8 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
             targetHeight,
             algorithm,
             fitMode,
-            ditherIntensity
+            ditherIntensity,
+            batchFilter
           );
 
           updatedItems[i] = completed;
@@ -261,6 +268,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
       algorithm,
       fitMode,
       ditherIntensity,
+      batchFilter,
       resampleFilter,
       colorMetric,
     ]
@@ -443,7 +451,7 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
         </div>
 
         {/* Settings Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 text-xs">
           {/* Target Resolution */}
           <div className="flex flex-col gap-1.5">
             <label className="text-neutral-400 font-medium">Target Dimensions (WxH)</label>
@@ -482,6 +490,25 @@ export const BatchProcessor: React.FC<BatchProcessorProps> = ({
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Quick Filter Preset */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-neutral-400 font-medium">Quick Filter Preset</label>
+            <select
+              value={batchFilter}
+              onChange={(e) => setBatchFilter(e.target.value as QuickFilterType)}
+              className="w-full px-2.5 py-1.5 bg-[#0a0d16] border border-neutral-700 rounded-lg text-neutral-200 text-xs focus:border-indigo-500 focus:outline-none cursor-pointer font-medium"
+            >
+              {QUICK_FILTERS.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.name} {f.tag ? `(${f.tag})` : ''}
+                </option>
+              ))}
+            </select>
+            <span className="text-[10px] text-neutral-400 truncate">
+              {QUICK_FILTERS.find((f) => f.id === batchFilter)?.description}
+            </span>
           </div>
 
           {/* Palette Selector */}
