@@ -14,6 +14,8 @@ import {
   Maximize,
   Info,
   Layers,
+  ArrowLeftRight,
+  Eye,
 } from 'lucide-react';
 
 interface ViewportCanvasProps {
@@ -25,6 +27,7 @@ interface ViewportCanvasProps {
 }
 
 type ViewMode = 'dithered' | 'split' | 'side-by-side' | 'hex-overlay';
+type ABState = 'original' | 'dithered';
 
 export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
   originalCanvas,
@@ -35,9 +38,12 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const ditherCanvasRef = useRef<HTMLCanvasElement>(null);
+  const originalCanvasRef = useRef<HTMLCanvasElement>(null);
+  const trackingOverlayRef = useRef<HTMLDivElement>(null);
   const overlayCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const [viewMode, setViewMode] = useState<ViewMode>('dithered');
+  const [abState, setAbState] = useState<ABState>('dithered');
   const [zoom, setZoom] = useState<number>(4); // Default 4x zoom for pixel art
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [splitPos, setSplitPos] = useState<number>(50); // percentage 0-100
@@ -55,6 +61,19 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
       ctx.putImageData(processedData.quantizedImageData, 0, 0);
     }
   }, [processedData]);
+
+  // Copy originalCanvas onto originalCanvasRef for zero-latency, artifact-free A/B crossfade
+  useEffect(() => {
+    if (!originalCanvas || !originalCanvasRef.current) return;
+    const canvas = originalCanvasRef.current;
+    canvas.width = originalCanvas.width;
+    canvas.height = originalCanvas.height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(originalCanvas, 0, 0);
+    }
+  }, [originalCanvas, width, height]);
 
   // Handle Hex Overlay rendering when viewMode is 'hex-overlay'
   useEffect(() => {
@@ -101,6 +120,33 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
     }
   }, [processedData, viewMode, zoom, width, height, palette]);
 
+  // Keyboard shortcut listener for quick A/B toggle (Spacebar)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is interacting with an input or textarea
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        setAbState((prev) => (prev === 'dithered' ? 'original' : 'dithered'));
+        if (viewMode !== 'dithered') {
+          setViewMode('dithered');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode]);
+
   // Handle mouse move for pixel coordinate inspection
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isDraggingSplit) {
@@ -110,8 +156,11 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
       return;
     }
 
-    if (!processedData || !ditherCanvasRef.current) return;
-    const rect = ditherCanvasRef.current.getBoundingClientRect();
+    if (!processedData) return;
+    const targetEl = trackingOverlayRef.current || ditherCanvasRef.current;
+    if (!targetEl) return;
+
+    const rect = targetEl.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
@@ -156,59 +205,119 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
     setZoom(fitZoom);
   };
 
+  const toggleAB = () => {
+    setAbState((prev) => (prev === 'dithered' ? 'original' : 'dithered'));
+    if (viewMode !== 'dithered') {
+      setViewMode('dithered');
+    }
+  };
+
   return (
     <div className="flex-1 flex flex-col bg-[#0b0d14] border border-neutral-800/80 rounded-xl overflow-hidden min-h-[440px]">
       {/* Viewport Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-[#121624] border-b border-neutral-800/80">
-        {/* View mode segmented buttons */}
-        <div className="flex items-center gap-1 bg-[#181e30] p-1 rounded-lg border border-neutral-750">
-          <button
-            onClick={() => setViewMode('dithered')}
-            className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-              viewMode === 'dithered'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white'
-            }`}
-            title="Dithered 4-bit EGA output"
-          >
-            Dithered (0-F)
-          </button>
-          <button
-            onClick={() => setViewMode('split')}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-              viewMode === 'split'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white'
-            }`}
-            title="Interactive Split Slider"
-          >
-            <SplitSquareVertical className="w-3.5 h-3.5" />
-            <span>Split Slider</span>
-          </button>
-          <button
-            onClick={() => setViewMode('side-by-side')}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-              viewMode === 'side-by-side'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white'
-            }`}
-            title="Side by side view"
-          >
-            <Columns className="w-3.5 h-3.5" />
-            <span>Side-by-Side</span>
-          </button>
-          <button
-            onClick={() => setViewMode('hex-overlay')}
-            className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
-              viewMode === 'hex-overlay'
-                ? 'bg-indigo-600 text-white shadow-sm'
-                : 'text-neutral-300 hover:text-white'
-            }`}
-            title="Inspect 0-F glyph on each pixel cell"
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span>Hex Grid (0-F)</span>
-          </button>
+        {/* Left Side: View Mode & A/B Toggle Segmented Control */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Main View modes */}
+          <div className="flex items-center gap-1 bg-[#181e30] p-1 rounded-lg border border-neutral-750">
+            <button
+              onClick={() => setViewMode('dithered')}
+              className={`px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                viewMode === 'dithered'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="Standard Viewport Canvas with A/B Crossfade"
+            >
+              Canvas View
+            </button>
+            <button
+              onClick={() => setViewMode('split')}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                viewMode === 'split'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="Interactive Split Slider"
+            >
+              <SplitSquareVertical className="w-3.5 h-3.5" />
+              <span>Split Slider</span>
+            </button>
+            <button
+              onClick={() => setViewMode('side-by-side')}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                viewMode === 'side-by-side'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="Side by side view"
+            >
+              <Columns className="w-3.5 h-3.5" />
+              <span>Side-by-Side</span>
+            </button>
+            <button
+              onClick={() => setViewMode('hex-overlay')}
+              className={`flex items-center gap-1 px-2.5 py-1 text-xs font-medium rounded-md transition-colors cursor-pointer ${
+                viewMode === 'hex-overlay'
+                  ? 'bg-indigo-600 text-white shadow-sm'
+                  : 'text-neutral-300 hover:text-white'
+              }`}
+              title="Inspect 0-F glyph on each pixel cell"
+            >
+              <Layers className="w-3.5 h-3.5" />
+              <span>Hex Grid (0-F)</span>
+            </button>
+          </div>
+
+          {/* Dedicated A/B Crossfade Toggle Button */}
+          <div className="flex items-center gap-1 bg-[#181e30] p-1 rounded-lg border border-neutral-750">
+            <span className="text-[10px] font-mono font-bold text-neutral-400 pl-1.5 pr-0.5">A/B:</span>
+            <button
+              onClick={() => {
+                setAbState('original');
+                if (viewMode !== 'dithered') setViewMode('dithered');
+              }}
+              className={`px-2 py-0.5 text-xs font-semibold rounded transition-all cursor-pointer ${
+                abState === 'original' && viewMode === 'dithered'
+                  ? 'bg-amber-500 text-neutral-950 font-bold shadow-sm ring-1 ring-amber-300'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="Switch to A: Original Source Image"
+            >
+              A: Original
+            </button>
+
+            <button
+              onClick={toggleAB}
+              onMouseDown={() => {
+                // Hold to peek original!
+                setAbState('original');
+                if (viewMode !== 'dithered') setViewMode('dithered');
+              }}
+              onMouseUp={() => {
+                setAbState('dithered');
+              }}
+              className="p-1 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded transition-colors cursor-pointer"
+              title="Click to crossfade toggle, or hold button down to peek Original (Shortcut: Spacebar)"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5 text-indigo-400" />
+            </button>
+
+            <button
+              onClick={() => {
+                setAbState('dithered');
+                if (viewMode !== 'dithered') setViewMode('dithered');
+              }}
+              className={`px-2 py-0.5 text-xs font-semibold rounded transition-all cursor-pointer ${
+                abState === 'dithered' && viewMode === 'dithered'
+                  ? 'bg-indigo-600 text-white font-bold shadow-sm ring-1 ring-indigo-400'
+                  : 'text-neutral-400 hover:text-neutral-200'
+              }`}
+              title="Switch to B: 4-Bit EGA Dithered Output"
+            >
+              B: Dithered
+            </button>
+          </div>
         </div>
 
         {/* Zoom & Grid tools */}
@@ -296,7 +405,7 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
           <div className="flex flex-wrap items-center justify-center gap-6 max-w-full">
             {/* Original */}
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xs font-medium text-neutral-400">Original Source</span>
+              <span className="text-xs font-medium text-neutral-400">Original Source (A)</span>
               <div
                 className="relative border border-neutral-700 shadow-xl overflow-hidden"
                 style={{
@@ -316,7 +425,7 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
 
             {/* Dithered */}
             <div className="flex flex-col items-center gap-2">
-              <span className="text-xs font-medium text-indigo-300">4-Bit EGA Dithered</span>
+              <span className="text-xs font-medium text-indigo-300">4-Bit EGA Dithered (B)</span>
               <div
                 className={`relative border border-neutral-700 shadow-xl overflow-hidden ${
                   showGrid && zoom >= 4 ? 'ring-1 ring-white/10' : ''
@@ -382,7 +491,7 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
             </div>
           </div>
         ) : (
-          /* Standard Dithered Canvas */
+          /* Standard Canvas Viewport with A/B Crossfade Animation */
           <div
             className={`relative border border-neutral-750 shadow-2xl overflow-hidden transition-all ${
               showGrid && zoom >= 4 ? 'pixel-grid-overlay' : ''
@@ -392,17 +501,66 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
               height: height * zoom,
             }}
           >
-            <canvas
-              ref={ditherCanvasRef}
-              className="w-full h-full pixelated block"
-              width={width}
-              height={height}
+            {/* Layer A: Original Source Image (Smooth Fade-in / Fade-out) */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+                abState === 'original' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <canvas
+                ref={originalCanvasRef}
+                className="w-full h-full pixelated block"
+                width={width}
+                height={height}
+              />
+            </div>
+
+            {/* Layer B: 4-Bit EGA Dithered Canvas (Smooth Fade-in / Fade-out) */}
+            <div
+              className={`absolute inset-0 transition-opacity duration-300 ease-in-out ${
+                abState === 'dithered' ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+              }`}
+            >
+              <canvas
+                ref={ditherCanvasRef}
+                className="w-full h-full pixelated block"
+                width={width}
+                height={height}
+              />
+            </div>
+
+            {/* Mouse tracking overlay to ensure continuous, pixel-accurate inspection */}
+            <div
+              ref={trackingOverlayRef}
+              className="absolute inset-0 z-20 cursor-crosshair"
             />
+
+            {/* Floating A/B Indicator Badge & Quick Flip Button */}
+            <div className="absolute top-2.5 left-2.5 z-30 flex items-center gap-1.5 bg-[#0e121e]/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-neutral-700/80 shadow-lg text-[11px] font-mono pointer-events-auto">
+              <span className="text-neutral-400">View:</span>
+              <span
+                className={`font-bold px-1.5 py-0.5 rounded ${
+                  abState === 'original'
+                    ? 'text-amber-300 bg-amber-950/70 border border-amber-800/70'
+                    : 'text-indigo-300 bg-indigo-950/70 border border-indigo-800/70'
+                }`}
+              >
+                {abState === 'original' ? 'A (Original Source)' : 'B (4-Bit Dithered)'}
+              </span>
+              <button
+                onClick={toggleAB}
+                className="ml-1 p-1 text-neutral-400 hover:text-white rounded hover:bg-neutral-800 transition-colors cursor-pointer"
+                title="Crossfade to other layer (Shortcut: Spacebar)"
+              >
+                <ArrowLeftRight className="w-3 h-3 text-indigo-400" />
+              </button>
+              <span className="hidden sm:inline text-[10px] text-neutral-500 pl-0.5">[Space]</span>
+            </div>
 
             {/* Pixel Grid SVG Overlay */}
             {showGrid && zoom >= 4 && (
               <svg
-                className="absolute inset-0 w-full h-full pointer-events-none opacity-20"
+                className="absolute inset-0 w-full h-full pointer-events-none opacity-20 z-25"
                 width={width * zoom}
                 height={height * zoom}
               >
@@ -431,11 +589,16 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
         {hoverPixel && (
           <div className="absolute bottom-4 left-4 bg-[#121624]/95 border border-neutral-700 rounded-lg p-2.5 shadow-2xl backdrop-blur-md flex items-center gap-3 text-xs z-30 pointer-events-none">
             <div
-              className="w-8 h-8 rounded-md border border-white/20 shadow-inner flex items-center justify-center font-mono font-bold text-sm"
-              style={{ backgroundColor: hoverPixel.paletteHex }}
+              className="w-8 h-8 rounded-md border border-white/20 shadow-inner flex items-center justify-center font-mono font-bold text-sm shrink-0"
+              style={{
+                backgroundColor:
+                  abState === 'original' && hoverPixel.originalRgb
+                    ? `rgb(${hoverPixel.originalRgb.join(',')})`
+                    : hoverPixel.paletteHex,
+              }}
             >
-              <span className="drop-shadow px-1 bg-black/30 rounded text-white text-xs">
-                {hoverPixel.hexNibble}
+              <span className="drop-shadow px-1 bg-black/40 rounded text-white text-xs">
+                {abState === 'original' ? 'A' : hoverPixel.hexNibble}
               </span>
             </div>
 
@@ -445,7 +608,11 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
                   ({hoverPixel.x}, {hoverPixel.y})
                 </span>
                 <span className="text-neutral-500">·</span>
-                <span className="text-indigo-400 font-bold">Nibble: {hoverPixel.hexNibble}</span>
+                {abState === 'original' ? (
+                  <span className="text-amber-400 font-bold">Mode A: Original</span>
+                ) : (
+                  <span className="text-indigo-400 font-bold">Nibble: {hoverPixel.hexNibble}</span>
+                )}
                 <span className="text-neutral-500">·</span>
                 <span className="text-neutral-300">Index {hoverPixel.colorIndex}</span>
               </div>
@@ -453,8 +620,8 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
                 <span className="text-neutral-200">{hoverPixel.colorName}</span>
                 <span>{hoverPixel.paletteHex}</span>
                 {hoverPixel.originalRgb && (
-                  <span className="text-neutral-500 font-mono">
-                    (orig rgb: {hoverPixel.originalRgb.join(',')})
+                  <span className="text-neutral-300 font-mono font-semibold">
+                    RGB({hoverPixel.originalRgb.join(', ')})
                   </span>
                 )}
               </div>
@@ -473,7 +640,10 @@ export const ViewportCanvas: React.FC<ViewportCanvasProps> = ({
           <span>Zoom: <strong className="text-neutral-200">{zoom}×</strong></span>
           <span className="text-neutral-600">|</span>
           <span>
-            Mode: <strong className="text-indigo-400">{viewMode}</strong>
+            Layer:{' '}
+            <strong className={abState === 'original' ? 'text-amber-400' : 'text-indigo-400'}>
+              {abState === 'original' ? 'A (Original Source)' : 'B (4-Bit Dithered)'}
+            </strong>
           </span>
         </div>
 
