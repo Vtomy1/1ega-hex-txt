@@ -18,6 +18,7 @@ import { BatchProcessor } from './components/BatchProcessor';
 import { PresetManagerModal } from './components/PresetManagerModal';
 import {
   ColorMetric,
+  CropRegion,
   DitherAlgorithm,
   FitMode,
   ImageAdjustments,
@@ -44,6 +45,7 @@ export default function App() {
   const [sourceImgElement, setSourceImgElement] = useState<HTMLImageElement | null>(null);
   const [originalWidth, setOriginalWidth] = useState<number>(0);
   const [originalHeight, setOriginalHeight] = useState<number>(0);
+  const [cropRegion, setCropRegion] = useState<CropRegion | null>(null);
 
   // Quick Filters state (Pre-quantization image processing presets)
   const [activeFilter, setActiveFilter] = useState<QuickFilterType>('none');
@@ -121,6 +123,7 @@ export default function App() {
               if (event.target?.result) {
                 setImageSrc(event.target.result as string);
                 setActiveSampleId('');
+                setCropRegion(null);
               }
             };
             reader.readAsDataURL(blob);
@@ -141,7 +144,7 @@ export default function App() {
     try {
       setIsProcessing(true);
 
-      // 1. Resize image onto intermediate canvas with Quick Filter pre-processing
+      // 1. Resize image onto intermediate canvas with custom crop & Quick Filter pre-processing
       const resizedCanvas = renderResizedImageToCanvas(
         sourceImgElement,
         width,
@@ -149,7 +152,8 @@ export default function App() {
         fitMode,
         resampleFilter,
         activeFilter,
-        filterStrength
+        filterStrength,
+        cropRegion
       );
       setOriginalResizedCanvas(resizedCanvas);
 
@@ -180,6 +184,7 @@ export default function App() {
     resampleFilter,
     activeFilter,
     filterStrength,
+    cropRegion,
     isCustomPalette,
     customColors,
     currentPalette,
@@ -355,6 +360,7 @@ export default function App() {
               activeSampleId={activeSampleId}
               onLoadImage={(url) => {
                 setImageSrc(url);
+                setCropRegion(null);
                 if (url.includes('sample_pixel_hero')) setActiveSampleId('hero');
                 else if (url.includes('sample_retro_scenery')) setActiveSampleId('scenery');
                 else if (url.includes('sample_arcade_scene')) setActiveSampleId('arcade');
@@ -365,6 +371,13 @@ export default function App() {
               onFilterChange={setActiveFilter}
               filterStrength={filterStrength}
               onFilterStrengthChange={setFilterStrength}
+              imageSrc={imageSrc}
+              originalWidth={originalWidth}
+              originalHeight={originalHeight}
+              targetWidth={width}
+              targetHeight={height}
+              cropRegion={cropRegion}
+              onCropChange={setCropRegion}
             />
 
             {/* 16-Color Palette Bar */}

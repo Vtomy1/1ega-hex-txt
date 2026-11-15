@@ -5,6 +5,7 @@
 
 import {
   ColorMetric,
+  CropRegion,
   DitherAlgorithm,
   FitMode,
   ImageAdjustments,
@@ -119,7 +120,8 @@ export function renderResizedImageToCanvas(
   fitMode: FitMode,
   filter: ResampleFilter,
   quickFilter: QuickFilterType = 'none',
-  filterStrength: number = 1.0
+  filterStrength: number = 1.0,
+  cropRegion?: CropRegion | null
 ): HTMLCanvasElement {
   const canvas = document.createElement('canvas');
   canvas.width = targetWidth;
@@ -132,16 +134,40 @@ export function renderResizedImageToCanvas(
     ctx.imageSmoothingQuality = 'low';
   }
 
-  const sW = sourceImage.width;
-  const sH = sourceImage.height;
+  const fullW =
+    sourceImage instanceof HTMLImageElement
+      ? sourceImage.naturalWidth || sourceImage.width
+      : sourceImage.width;
+  const fullH =
+    sourceImage instanceof HTMLImageElement
+      ? sourceImage.naturalHeight || sourceImage.height
+      : sourceImage.height;
+
+  // Compute cropped base sub-rectangle if a custom crop region is specified
+  let baseSx = 0;
+  let baseSy = 0;
+  let sW = fullW;
+  let sH = fullH;
+
+  if (cropRegion && cropRegion.width > 0 && cropRegion.height > 0 && fullW > 0 && fullH > 0) {
+    const cx = Math.max(0, Math.min(1, cropRegion.x));
+    const cy = Math.max(0, Math.min(1, cropRegion.y));
+    const cw = Math.max(0.001, Math.min(1 - cx, cropRegion.width));
+    const ch = Math.max(0.001, Math.min(1 - cy, cropRegion.height));
+
+    baseSx = Math.max(0, Math.min(fullW - 1, Math.round(cx * fullW)));
+    baseSy = Math.max(0, Math.min(fullH - 1, Math.round(cy * fullH)));
+    sW = Math.max(1, Math.min(fullW - baseSx, Math.round(cw * fullW)));
+    sH = Math.max(1, Math.min(fullH - baseSy, Math.round(ch * fullH)));
+  }
 
   let dx = 0;
   let dy = 0;
   let dW = targetWidth;
   let dH = targetHeight;
 
-  let sx = 0;
-  let sy = 0;
+  let sx = baseSx;
+  let sy = baseSy;
   let sCropW = sW;
   let sCropH = sH;
 
@@ -164,13 +190,13 @@ export function renderResizedImageToCanvas(
     const scale = Math.max(targetWidth / sW, targetHeight / sH);
     sCropW = Math.round(targetWidth / scale);
     sCropH = Math.round(targetHeight / scale);
-    sx = Math.round((sW - sCropW) / 2);
-    sy = Math.round((sH - sCropH) / 2);
+    sx = baseSx + Math.round((sW - sCropW) / 2);
+    sy = baseSy + Math.round((sH - sCropH) / 2);
   } else if (fitMode === 'center-crop') {
     sCropW = Math.min(sW, targetWidth);
     sCropH = Math.min(sH, targetHeight);
-    sx = Math.round((sW - sCropW) / 2);
-    sy = Math.round((sH - sCropH) / 2);
+    sx = baseSx + Math.round((sW - sCropW) / 2);
+    sy = baseSy + Math.round((sH - sCropH) / 2);
     dW = sCropW;
     dH = sCropH;
     dx = Math.round((targetWidth - dW) / 2);

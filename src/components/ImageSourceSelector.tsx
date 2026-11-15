@@ -3,10 +3,20 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useRef } from 'react';
-import { Upload, Sparkles, Layers, Wand2, RotateCcw, SlidersHorizontal } from 'lucide-react';
-import { QuickFilterType } from '../types/palette';
+import React, { useRef, useState } from 'react';
+import {
+  Upload,
+  Sparkles,
+  Layers,
+  Wand2,
+  RotateCcw,
+  SlidersHorizontal,
+  Crop as CropIcon,
+  X,
+} from 'lucide-react';
+import { CropRegion, QuickFilterType } from '../types/palette';
 import { QUICK_FILTERS } from '../utils/filter';
+import { ImageCropModal } from './ImageCropModal';
 
 interface SampleItem {
   id: string;
@@ -44,6 +54,13 @@ interface ImageSourceSelectorProps {
   onFilterChange?: (filter: QuickFilterType) => void;
   filterStrength?: number;
   onFilterStrengthChange?: (strength: number) => void;
+  imageSrc?: string;
+  originalWidth?: number;
+  originalHeight?: number;
+  targetWidth?: number;
+  targetHeight?: number;
+  cropRegion?: CropRegion | null;
+  onCropChange?: (crop: CropRegion | null) => void;
 }
 
 export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
@@ -54,8 +71,16 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
   onFilterChange,
   filterStrength = 1.0,
   onFilterStrengthChange,
+  imageSrc,
+  originalWidth = 0,
+  originalHeight = 0,
+  targetWidth = 64,
+  targetHeight = 64,
+  cropRegion = null,
+  onCropChange,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -86,16 +111,21 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
 
   const currentFilterPreset = QUICK_FILTERS.find((f) => f.id === activeFilter) || QUICK_FILTERS[0];
 
+  const cropPixelW =
+    cropRegion && originalWidth > 0 ? Math.max(1, Math.round(cropRegion.width * originalWidth)) : 0;
+  const cropPixelH =
+    cropRegion && originalHeight > 0 ? Math.max(1, Math.round(cropRegion.height * originalHeight)) : 0;
+
   return (
     <div className="bg-[#121624] border border-neutral-800/80 rounded-xl p-3.5 flex flex-col gap-3 shadow-sm">
-      {/* Top Row: File Upload, Batch Mode, Paste Hint, and Preset Samples */}
+      {/* Top Row: File Upload, Crop Area, Batch Mode, Paste Hint, and Preset Samples */}
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
         className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-neutral-800/70"
       >
-        {/* Upload button & drop instructions */}
-        <div className="flex items-center gap-2.5">
+        {/* Upload button, crop area button & drop instructions */}
+        <div className="flex flex-wrap items-center gap-2">
           <input
             ref={fileInputRef}
             type="file"
@@ -111,6 +141,36 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
             <span>Upload Image</span>
           </button>
 
+          {imageSrc && onCropChange && (
+            <div className="flex items-center">
+              <button
+                onClick={() => setIsCropModalOpen(true)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 border text-xs font-medium transition-colors cursor-pointer ${
+                  cropRegion
+                    ? 'bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border-amber-500/50 rounded-l-lg'
+                    : 'bg-[#1e253b] hover:bg-[#283250] text-neutral-200 border-neutral-700/80 rounded-lg'
+                }`}
+                title="Define a custom cropping area before dithering"
+              >
+                <CropIcon className={`w-3.5 h-3.5 ${cropRegion ? 'text-amber-400' : 'text-indigo-400'}`} />
+                <span>
+                  {cropRegion && cropPixelW > 0 && cropPixelH > 0
+                    ? `Crop (${cropPixelW}×${cropPixelH})`
+                    : 'Crop Area'}
+                </span>
+              </button>
+              {cropRegion && (
+                <button
+                  onClick={() => onCropChange(null)}
+                  className="px-1.5 py-1.5 bg-amber-500/15 hover:bg-rose-500/25 text-amber-300 hover:text-rose-300 border-y border-r border-amber-500/50 rounded-r-lg transition-colors cursor-pointer"
+                  title="Clear custom crop (use full image)"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
+            </div>
+          )}
+
           {onOpenBatch && (
             <button
               onClick={onOpenBatch}
@@ -122,7 +182,7 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
             </button>
           )}
 
-          <span className="hidden sm:inline text-[11px] text-neutral-400">
+          <span className="hidden xl:inline text-[11px] text-neutral-400">
             Drop image or paste (<kbd className="font-mono text-neutral-300">Ctrl+V</kbd>)
           </span>
         </div>
@@ -239,16 +299,44 @@ export const ImageSourceSelector: React.FC<ImageSourceSelectorProps> = ({
         </div>
 
         {/* Informative Sub-bar */}
-        <div className="text-[11px] text-neutral-400 flex items-center justify-between gap-2 pt-0.5">
+        <div className="text-[11px] text-neutral-400 flex flex-wrap items-center justify-between gap-2 pt-0.5">
           <p className="truncate">
             <span className="text-neutral-300 font-medium">{currentFilterPreset.name}:</span>{' '}
             <span>{currentFilterPreset.description}</span>
           </p>
-          <span className="font-mono text-[10px] text-neutral-400 shrink-0 hidden md:inline">
-            Applies to source before 4-bit error diffusion
-          </span>
+          <div className="flex items-center gap-3 shrink-0">
+            {cropRegion && originalWidth > 0 && originalHeight > 0 && (
+              <button
+                onClick={() => setIsCropModalOpen(true)}
+                className="font-mono text-[10px] px-2 py-0.5 rounded bg-amber-500/10 text-amber-300 border border-amber-500/30 hover:bg-amber-500/20 transition-colors cursor-pointer"
+                title="Click to adjust custom crop region"
+              >
+                Cropped: {cropPixelW}×{cropPixelH} px @ ({Math.round(cropRegion.x * originalWidth)},{' '}
+                {Math.round(cropRegion.y * originalHeight)})
+              </button>
+            )}
+            <span className="font-mono text-[10px] text-neutral-400 hidden md:inline">
+              Applies to source before 4-bit error diffusion
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* Interactive Crop Editor Modal */}
+      {imageSrc && onCropChange && (
+        <ImageCropModal
+          isOpen={isCropModalOpen}
+          onClose={() => setIsCropModalOpen(false)}
+          imageSrc={imageSrc}
+          originalWidth={originalWidth}
+          originalHeight={originalHeight}
+          targetWidth={targetWidth}
+          targetHeight={targetHeight}
+          initialCrop={cropRegion}
+          onApplyCrop={onCropChange}
+        />
+      )}
     </div>
   );
 };
+

@@ -122,6 +122,13 @@ export interface BatchExportOptions {
   lineWrap?: number;
 }
 
+export interface CropRegion {
+  x: number;      // Normalized left offset (0..1)
+  y: number;      // Normalized top offset (0..1)
+  width: number;  // Normalized width (0..1)
+  height: number; // Normalized height (0..1)
+}
+
 export interface PresetSettings {
   algorithm: DitherAlgorithm;
   ditherIntensity: number;
@@ -146,3 +153,4 @@ export interface UserPreset {
   createdAt: number;
   settings: PresetSettings;
 }
+
