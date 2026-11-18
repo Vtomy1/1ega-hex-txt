@@ -14,6 +14,7 @@ import { HexExportDrawer } from './components/HexExportDrawer';
 import { PalettesGuide } from './components/PalettesGuide';
 import { FormatGuide } from './components/FormatGuide';
 import { ColorHistogram } from './components/ColorHistogram';
+import { LuminanceMonitor } from './components/LuminanceMonitor';
 import { BatchProcessor } from './components/BatchProcessor';
 import { PresetManagerModal } from './components/PresetManagerModal';
 import {
@@ -454,6 +455,22 @@ export default function App() {
                   }
                   width={width}
                   height={height}
+                />
+
+                <LuminanceMonitor
+                  processedData={processedData}
+                  palette={
+                    isCustomPalette
+                      ? {
+                          id: 'custom',
+                          name: 'Custom User Palette',
+                          category: 'Custom',
+                          description: '',
+                          colors: customColors,
+                        }
+                      : currentPalette
+                  }
+                  totalPixels={width * height}
                 />
               </div>
             </div>
